@@ -8,8 +8,8 @@ export default function Login() {
 const [open, setOpen] = useState(false)
 
   return (
-    <div className='h-[100vh] flex flex-col items-center justify-center text-white'>
-      <div className='h-[300px] w-80 bg-green-800 px-6 my-4'>
+    <div className='h-[100vh] flex flex-col items-center  justify-center text-white'>
+      <div className='h-[350px] w-80 bg-green-800 rounded-lg px-6  my-4'>
         <div>
           <h2 className='text-3xl font-bold pb-6 text-center'> Register</h2>
           <from className= "flex flex-col items-center" action="">
