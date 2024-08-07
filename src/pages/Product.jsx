@@ -42,15 +42,7 @@ const Product = () => {
           </button>
         </div>
         {/* list veiw */}
-        <div className="border gap-2  w-[85%] flex justify-between ">
-          <div className="border-4 rounded-2xl w-60 h-60 border-slate-400 bg-slate-400 px-2 hover:text-white hover:bg-slate-400 hover:border-slate-600 transition-all duration-300 ">
-            <div className="font-serif py-2 px-2">Name</div>
-          </div>
-          <div className="border-4 w-60 h-60"></div>
-          <div className="border-4 w-60 h-60"></div>
-          <div className="border-4 w-60 h-60"></div>
-          <div className="border-4 w-60 h-60"></div>
-        </div>
+        <div></div>
       </div>
     </div>
   );

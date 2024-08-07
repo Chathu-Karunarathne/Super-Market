@@ -1,13 +1,12 @@
 import { useState, useEffect } from "react";
 import { IoMdMail } from "react-icons/io";
-import { FaUser } from "react-icons/fa";
-import { FaLock } from "react-icons/fa";
+import { FaUser, FaLock } from "react-icons/fa";
 import { FaRegEyeSlash } from "react-icons/fa6";
 import Registerimage from "../assets/Registerimage.jpg";
 import { Link } from "react-router-dom";
 
 export default function Register() {
-  const initialValues = { username: "", email: "", password: "" };
+  const initialValues = { username: "", email: "", password: "", confirmPassword: "" };
   const [formValues, setFormValues] = useState(initialValues);
   const [formErrors, setFormErrors] = useState({});
   const [isSubmit, setIsSubmit] = useState(false);
@@ -48,6 +47,11 @@ export default function Register() {
     } else if (values.password.length > 10) {
       errors.password = "Password cannot exceed more than 10 characters";
     }
+    if (!values.confirmPassword) {
+      errors.confirmPassword = "Confirm Password is required";
+    } else if (values.confirmPassword !== values.password) {
+      errors.confirmPassword = "Passwords do not match";
+    }
 
     return errors;
   };
@@ -60,7 +64,7 @@ export default function Register() {
           src={Registerimage}
           alt="Register"
         />
-        <div className="h-[450px] w-[25%] bg-slate-500 rounded-xl px-6">
+        <div className="h-[480px] w-[25%] bg-slate-500 rounded-xl px-6">
           <div className="">
             <h2 className="text-3xl font-bold pb-2 m-4 text-center">Register</h2>
             <form className="flex flex-col items-center" onSubmit={handleSubmit}>
@@ -106,7 +110,10 @@ export default function Register() {
                   name="confirmPassword"
                   placeholder="Confirm Password"
                   type="password"
+                  value={formValues.confirmPassword}
+                  onChange={handleChange}
                 />
+                <p className="text-red-500">{formErrors.confirmPassword}</p>
                 <FaRegEyeSlash className="absolute top-[35%] right-3" />
               </div>
 

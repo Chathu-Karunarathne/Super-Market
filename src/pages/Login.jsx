@@ -81,9 +81,11 @@ export default function Login() {
               )}
               <FaLock className="absolute top-[35%] right-3" />
             </div>
-            
-              <div className="py-4 cursor-pointer">Forgot Password</div>
-            
+
+            <button className="py-4 cursor-pointer  rounded-full bg-slate-500">
+              Forgot Password
+            </button>
+
             <button className="my-2 py-2 w-full rounded-full bg-slate-500">
               Login
             </button>
