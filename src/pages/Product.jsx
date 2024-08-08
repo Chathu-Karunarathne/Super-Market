@@ -13,9 +13,40 @@ const Product = () => {
 
   const [products, setProducts] = useState(initialProducts);
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   const handleCategoryClick = (category) => {
     setSelectedCategory(category);
+  };
+
+  const handleProductClick = (product) => {
+    setSelectedProduct(product);
+    setIsModalOpen(true);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setSelectedProduct((prevProduct) => ({
+      ...prevProduct,
+      [name]: value,
+    }));
+  };
+
+  const handleSaveChanges = () => {
+    setProducts((prevProducts) =>
+      prevProducts.map((product) =>
+        product.id === selectedProduct.id ? selectedProduct : product
+      )
+    );
+    setIsModalOpen(false);
+  };
+
+  const handleDeleteProduct = () => {
+    setProducts((prevProducts) =>
+      prevProducts.filter((product) => product.id !== selectedProduct.id)
+    );
+    setIsModalOpen(false);
   };
 
   const filteredProducts =
@@ -88,6 +119,7 @@ const Product = () => {
                 <th className="py-2 px-4 border-b">Name</th>
                 <th className="py-2 px-4 border-b">Quantity</th>
                 <th className="py-2 px-4 border-b">Price</th>
+                <th className="py-2 px-4 border-b">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -97,12 +129,79 @@ const Product = () => {
                   <td className="py-2 px-4 border-b">{product.name}</td>
                   <td className="py-2 px-4 border-b">{product.qty}</td>
                   <td className="py-2 px-4 border-b">{product.price}</td>
+                  <td className="py-2 px-4 border-b">
+                    <button
+                      onClick={() => handleProductClick(product)}
+                      className="bg-blue-500 text-white px-2 py-1 rounded"
+                    >
+                      Edit
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       </div>
+
+      {/* Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-md w-[400px]">
+            <h2 className="text-xl font-semibold mb-4">Edit Product</h2>
+            <label className="block mb-2">
+              Name:
+              <input
+                type="text"
+                name="name"
+                value={selectedProduct.name}
+                onChange={handleInputChange}
+                className="w-full px-2 py-1 border rounded"
+              />
+            </label>
+            <label className="block mb-2">
+              Quantity:
+              <input
+                type="number"
+                name="qty"
+                value={selectedProduct.qty}
+                onChange={handleInputChange}
+                className="w-full px-2 py-1 border rounded"
+              />
+            </label>
+            <label className="block mb-2">
+              Price:
+              <input
+                type="text"
+                name="price"
+                value={selectedProduct.price}
+                onChange={handleInputChange}
+                className="w-full px-2 py-1 border rounded"
+              />
+            </label>
+            <div className="flex justify-end mt-4">
+              <button
+                onClick={handleSaveChanges}
+                className="bg-green-500 text-white px-4 py-2 rounded mr-2"
+              >
+                Save
+              </button>
+              <button
+                onClick={handleDeleteProduct}
+                className="bg-red-500 text-white px-4 py-2 rounded mr-2"
+              >
+                Delete
+              </button>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="bg-gray-300 px-4 py-2 rounded"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
