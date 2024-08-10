@@ -6,7 +6,12 @@ import Registerimage from "../assets/Registerimage.jpg";
 import { Link } from "react-router-dom";
 
 export default function Register() {
-  const initialValues = { username: "", email: "", password: "", confirmPassword: "" };
+  const initialValues = {
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  };
   const [formValues, setFormValues] = useState(initialValues);
   const [formErrors, setFormErrors] = useState({});
   const [isSubmit, setIsSubmit] = useState(false);
@@ -20,7 +25,9 @@ export default function Register() {
     e.preventDefault();
     const errors = validate(formValues);
     setFormErrors(errors);
-    setIsSubmit(true);
+    if (Object.keys(formErrors).length === 0) {
+      setIsSubmit(true);
+    }
   };
 
   useEffect(() => {
@@ -44,8 +51,6 @@ export default function Register() {
       errors.password = "Password is required";
     } else if (values.password.length < 4) {
       errors.password = "Password must be more than 4 characters";
-    } else if (values.password.length > 10) {
-      errors.password = "Password cannot exceed more than 10 characters";
     }
     if (!values.confirmPassword) {
       errors.confirmPassword = "Confirm Password is required";
@@ -66,8 +71,13 @@ export default function Register() {
         />
         <div className="h-[480px] w-[25%] bg-slate-500 rounded-xl px-6">
           <div className="">
-            <h2 className="text-3xl font-bold pb-2 m-4 text-center">Register</h2>
-            <form className="flex flex-col items-center" onSubmit={handleSubmit}>
+            <h2 className="text-3xl font-bold pb-2 m-4 text-center">
+              Register
+            </h2>
+            <form
+              className="flex flex-col items-center"
+              onSubmit={handleSubmit}
+            >
               <div className="w-full relative">
                 <input
                   className="border border-gray-600 w-full rounded-full py-2 px-4 my-2 bg-transparent"
@@ -116,7 +126,6 @@ export default function Register() {
                 <p className="text-red-500">{formErrors.confirmPassword}</p>
                 <FaRegEyeSlash className="absolute top-[35%] right-3" />
               </div>
-
               <button className="my-2 py-2 w-full rounded-full bg-slate-500">
                 Register
               </button>
@@ -127,8 +136,10 @@ export default function Register() {
                 </span>
               </span>
             </form>
-            {Object.keys(formErrors).length === 0 && isSubmit && (
-              <div className="ui message success px-8 py-5 font-bold">Signed in successfully</div>
+            {isSubmit && (
+              <div className="ui message success px-8 py-5 font-bold">
+                Signed in successfully
+              </div>
             )}
             {/* <pre>{JSON.stringify(formValues, undefined, 2)}</pre> */}
           </div>
