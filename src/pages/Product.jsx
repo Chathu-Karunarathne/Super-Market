@@ -3,18 +3,26 @@ import { FaSearch } from "react-icons/fa";
 
 const Product = () => {
   const initialProducts = [
-    { id: 1, name: "Apple", category: "Fruit", qty: 50, price: "200/=" },
-    { id: 2, name: "Carrot", category: "Vegetable", qty: 30, price: "500/=" },
-    { id: 3, name: "Milk", category: "Grocery", qty: 20, price: "100/=" },
-    { id: 4, name: "Banana", category: "Fruit", qty: 40, price: "250/=" },
-    { id: 5, name: "Potato", category: "Vegetable", qty: 25, price: "200/=" },
-    { id: 6, name: "Bread", category: "Grocery", qty: 15, price: "150/=" },
+    { id: 1, name: "Apple", category: "Fruit", qty: 50, price: "200" },
+    { id: 2, name: "Carrot", category: "Vegetable", qty: 30, price: "500" },
+    { id: 3, name: "Milk", category: "Grocery", qty: 20, price: "100" },
+    { id: 4, name: "Banana", category: "Fruit", qty: 40, price: "250" },
+    { id: 5, name: "Potato", category: "Vegetable", qty: 25, price: "200" },
+    { id: 6, name: "Bread", category: "Grocery", qty: 15, price: "150" },
   ];
 
   const [products, setProducts] = useState(initialProducts);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [isAddItemModalOpen, setIsAddItemModalOpen] = useState(false);
+  const [newProduct, setNewProduct] = useState({
+    id: null,
+    name: "",
+    category: selectedCategory !== "All" ? selectedCategory : "",
+    qty: 0,
+    price: "",
+  });
 
   const handleCategoryClick = (category) => {
     setSelectedCategory(category);
@@ -47,6 +55,25 @@ const Product = () => {
       prevProducts.filter((product) => product.id !== selectedProduct.id)
     );
     setIsModalOpen(false);
+  };
+
+  const handleAddItemInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewProduct((prevProduct) => ({
+      ...prevProduct,
+      [name]: value,
+    }));
+  };
+
+  const handleAddNewItem = () => {
+    setNewProduct((prevProduct) => ({
+      ...prevProduct,
+      id: products.length + 1, 
+
+      
+    }));
+    setProducts((prevProducts) => [...prevProducts, newProduct]);
+    setIsAddItemModalOpen(false);
   };
 
   const filteredProducts =
@@ -103,7 +130,10 @@ const Product = () => {
           >
             Grocery
           </button>
-          <button className="font-bold py-2 border-b-2 border-slate-700 bg-white px-2 hover:text-white hover:bg-slate-700 hover:border-white transition-all duration-300">
+          <button
+            className="font-bold py-2 border-b-2 border-slate-700 bg-white px-2 hover:text-white hover:bg-slate-700 hover:border-white transition-all duration-300"
+            onClick={() => setIsAddItemModalOpen(true)}
+          >
             Add Item
           </button>
           <button className="font-bold py-2 border-b-2 border-slate-700 bg-white px-2 hover:text-white hover:bg-slate-700 hover:border-white transition-all duration-300">
@@ -144,7 +174,7 @@ const Product = () => {
         </div>
       </div>
 
-      {/* Modal */}
+      {/* Edit Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
           <div className="bg-white p-6 rounded-md w-[400px]">
@@ -194,6 +224,73 @@ const Product = () => {
               </button>
               <button
                 onClick={() => setIsModalOpen(false)}
+                className="bg-gray-300 px-4 py-2 rounded"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Item Modal */}
+      {isAddItemModalOpen && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-md w-[400px]">
+            <h2 className="text-xl font-semibold mb-4">Add New Product</h2>
+            <label className="block mb-2">
+              Name:
+              <input
+                type="text"
+                name="name"
+                value={newProduct.name}
+                onChange={handleAddItemInputChange}
+                className="w-full px-2 py-1 border rounded"
+              />
+            </label>
+            <label className="block mb-2">
+              Category:
+              <select
+                name="category"
+                value={newProduct.category}
+                onChange={handleAddItemInputChange}
+                className="w-full px-2 py-1 border rounded"
+              >
+                <option value="">Select a Category</option>
+                <option value="Fruit">Fruit</option>
+                <option value="Vegetable">Vegetable</option>
+                <option value="Grocery">Grocery</option>
+              </select>
+            </label>
+            <label className="block mb-2">
+              Quantity:
+              <input
+                type="number"
+                name="qty"
+                value={newProduct.qty}
+                onChange={handleAddItemInputChange}
+                className="w-full px-2 py-1 border rounded"
+              />
+            </label>
+            <label className="block mb-2">
+              Price:
+              <input
+                type="text"
+                name="price"
+                value={newProduct.price}
+                onChange={handleAddItemInputChange}
+                className="w-full px-2 py-1 border rounded"
+              />
+            </label>
+            <div className="flex justify-end mt-4">
+              <button
+                onClick={handleAddNewItem}
+                className="bg-green-500 text-white px-4 py-2 rounded mr-2"
+              >
+                Add
+              </button>
+              <button
+                onClick={() => setIsAddItemModalOpen(false)}
                 className="bg-gray-300 px-4 py-2 rounded"
               >
                 Cancel
