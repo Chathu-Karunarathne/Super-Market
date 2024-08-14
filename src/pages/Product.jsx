@@ -11,11 +11,15 @@ const Product = () => {
     { id: 6, name: "Bread", category: "Grocery", qty: 15, price: "150" },
   ];
 
+  const initialCategories = ["Fruit", "Vegetable", "Grocery"];
+
   const [products, setProducts] = useState(initialProducts);
+  const [categories, setCategories] = useState(initialCategories);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isAddItemModalOpen, setIsAddItemModalOpen] = useState(false);
+  const [isAddCategoryVisible, setIsAddCategoryVisible] = useState(false);
   const [newProduct, setNewProduct] = useState({
     id: null,
     name: "",
@@ -23,9 +27,13 @@ const Product = () => {
     qty: 0,
     price: "",
   });
+  const [newCategory, setNewCategory] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
 
   const handleCategoryClick = (category) => {
     setSelectedCategory(category);
+    setSearchTerm(""); // Reset search term when changing category
   };
 
   const handleProductClick = (product) => {
@@ -68,18 +76,53 @@ const Product = () => {
   const handleAddNewItem = () => {
     setNewProduct((prevProduct) => ({
       ...prevProduct,
-      id: products.length + 1, 
-
-      
+      id: products.length + 1,
     }));
     setProducts((prevProducts) => [...prevProducts, newProduct]);
     setIsAddItemModalOpen(false);
   };
 
+  const handleAddCategoryInputChange = (e) => {
+    setNewCategory(e.target.value);
+  };
+
+  const handleAddNewCategory = () => {
+    if (newCategory && !categories.includes(newCategory)) {
+      setCategories((prevCategories) => [...prevCategories, newCategory]);
+      setNewCategory("");
+    }
+    setIsAddCategoryVisible(false);
+  };
+
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+
+    if (value.length > 0) {
+      const searchSuggestions = products.filter((product) =>
+        product.name.toLowerCase().startsWith(value.toLowerCase())
+      );
+      setSuggestions(searchSuggestions);
+    } else {
+      setSuggestions([]);
+    }
+  };
+
+  const handleSuggestionClick = (suggestion) => {
+    setSearchTerm(suggestion.name);
+    setSuggestions([]);
+  };
+
   const filteredProducts =
     selectedCategory === "All"
-      ? products
-      : products.filter((product) => product.category === selectedCategory);
+      ? products.filter((product) =>
+          product.name.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      : products.filter(
+          (product) =>
+            product.category === selectedCategory &&
+            product.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
 
   return (
     <div className="min-h-screen p-2 bg-slate-300 text-slate-600">
@@ -88,14 +131,29 @@ const Product = () => {
         <h3 className="font-semibold text-xl uppercase text-slate-800 cursor-default">
           Super
         </h3>
-        <form className="flex items-center gap-4">
+        <form className="relative flex items-center gap-4">
           <div className="relative w-72">
             <FaSearch className="absolute top-2 left-3 text-slate-500" />
             <input
               type="search"
               placeholder="Search by Product"
+              value={searchTerm}
+              onChange={handleSearchChange}
               className="py-1 px-3 rounded-md pl-10 w-full"
             />
+            {suggestions.length > 0 && (
+              <ul className="absolute top-full left-0 w-full bg-white border rounded mt-1 max-h-48 overflow-y-auto">
+                {suggestions.map((suggestion) => (
+                  <li
+                    key={suggestion.id}
+                    className="px-4 py-2 hover:bg-slate-200 cursor-pointer"
+                    onClick={() => handleSuggestionClick(suggestion)}
+                  >
+                    {suggestion.name}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
           <button className="border-2 border-slate-700 bg-white px-2 rounded-lg hover:text-white hover:bg-slate-700 hover:border-white transition-all duration-300">
             Search
@@ -112,36 +170,56 @@ const Product = () => {
           >
             All Products
           </button>
-          <button
-            className="font-bold py-2 border-b-2 border-slate-700 bg-white px-2 hover:text-white hover:bg-slate-700 hover:border-white transition-all duration-300"
-            onClick={() => handleCategoryClick("Fruit")}
-          >
-            Fruit
-          </button>
-          <button
-            className="font-bold py-2 border-b-2 border-slate-700 bg-white px-2 hover:text-white hover:bg-slate-700 hover:border-white transition-all duration-300"
-            onClick={() => handleCategoryClick("Vegetable")}
-          >
-            Vegetable
-          </button>
-          <button
-            className="font-bold py-2 border-b-2 border-slate-700 bg-white px-2 hover:text-white hover:bg-slate-700 hover:border-white transition-all duration-300"
-            onClick={() => handleCategoryClick("Grocery")}
-          >
-            Grocery
-          </button>
+          {categories.map((category) => (
+            <button
+              key={category}
+              className="font-bold py-2 border-b-2 border-slate-700 bg-white px-2 hover:text-white hover:bg-slate-700 hover:border-white transition-all duration-300"
+              onClick={() => handleCategoryClick(category)}
+            >
+              {category}
+            </button>
+          ))}
           <button
             className="font-bold py-2 border-b-2 border-slate-700 bg-white px-2 hover:text-white hover:bg-slate-700 hover:border-white transition-all duration-300"
             onClick={() => setIsAddItemModalOpen(true)}
           >
             Add Item
           </button>
-          <button className="font-bold py-2 border-b-2 border-slate-700 bg-white px-2 hover:text-white hover:bg-slate-700 hover:border-white transition-all duration-300">
+          <button
+            className="font-bold py-2 border-b-2 border-slate-700 bg-white px-2 hover:text-white hover:bg-slate-700 hover:border-white transition-all duration-300"
+            onClick={() => setIsAddCategoryVisible(true)}
+          >
             Add Category
           </button>
         </div>
         {/* list view */}
         <div className="flex-grow p-4">
+          {isAddCategoryVisible && (
+            <div className="mb-4 p-4 bg-white border rounded">
+              <h2 className="text-xl font-semibold mb-4">Add New Category</h2>
+              <input
+                type="text"
+                placeholder="Enter category name"
+                value={newCategory}
+                onChange={handleAddCategoryInputChange}
+                className="w-full px-2 py-1 border rounded mb-4"
+              />
+              <div className="flex justify-end">
+                <button
+                  onClick={handleAddNewCategory}
+                  className="bg-green-500 text-white px-4 py-2 rounded mr-2"
+                >
+                  Add
+                </button>
+                <button
+                  onClick={() => setIsAddCategoryVisible(false)}
+                  className="bg-gray-300 px-4 py-2 rounded"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
           <table className="min-w-full bg-white">
             <thead>
               <tr>
@@ -149,6 +227,7 @@ const Product = () => {
                 <th className="py-2 px-4 border-b">Name</th>
                 <th className="py-2 px-4 border-b">Quantity</th>
                 <th className="py-2 px-4 border-b">Price</th>
+                <th className="py-2 px-4 border-b">Category</th>
                 <th className="py-2 px-4 border-b">Actions</th>
               </tr>
             </thead>
@@ -159,10 +238,11 @@ const Product = () => {
                   <td className="py-2 px-4 border-b">{product.name}</td>
                   <td className="py-2 px-4 border-b">{product.qty}</td>
                   <td className="py-2 px-4 border-b">{product.price}</td>
+                  <td className="py-2 px-4 border-b">{product.category}</td>
                   <td className="py-2 px-4 border-b">
                     <button
                       onClick={() => handleProductClick(product)}
-                      className="bg-blue-500 text-white px-2 py-1 rounded"
+                      className="bg-blue-500 text-white px-2 py-1 rounded mr-2"
                     >
                       Edit
                     </button>
@@ -173,7 +253,6 @@ const Product = () => {
           </table>
         </div>
       </div>
-
       {/* Edit Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
@@ -217,14 +296,14 @@ const Product = () => {
                 Save
               </button>
               <button
-                onClick={handleDeleteProduct}
-                className="bg-red-500 text-white px-4 py-2 rounded mr-2"
+                onClick={() => handleProductClick(product)}
+                className="bg-red-500 text-white px-2 py-1 rounded mr-2"
               >
                 Delete
               </button>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="bg-gray-300 px-4 py-2 rounded"
+                className="bg-gray-300 px-4 py-2 rounded mr-2"
               >
                 Cancel
               </button>
@@ -237,7 +316,7 @@ const Product = () => {
       {isAddItemModalOpen && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
           <div className="bg-white p-6 rounded-md w-[400px]">
-            <h2 className="text-xl font-semibold mb-4">Add New Product</h2>
+            <h2 className="text-xl font-semibold mb-4">Add New Item</h2>
             <label className="block mb-2">
               Name:
               <input
@@ -256,10 +335,12 @@ const Product = () => {
                 onChange={handleAddItemInputChange}
                 className="w-full px-2 py-1 border rounded"
               >
-                <option value="">Select a Category</option>
-                <option value="Fruit">Fruit</option>
-                <option value="Vegetable">Vegetable</option>
-                <option value="Grocery">Grocery</option>
+                <option value="">Select Category</option>
+                {categories.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
               </select>
             </label>
             <label className="block mb-2">
@@ -285,13 +366,13 @@ const Product = () => {
             <div className="flex justify-end mt-4">
               <button
                 onClick={handleAddNewItem}
-                className="bg-green-500 text-white px-4 py-2 rounded mr-2"
+                className="bg-green-500 text-white px-4 py-2 rounded"
               >
                 Add
               </button>
               <button
                 onClick={() => setIsAddItemModalOpen(false)}
-                className="bg-gray-300 px-4 py-2 rounded"
+                className="bg-gray-300 px-4 py-2 rounded ml-2"
               >
                 Cancel
               </button>
