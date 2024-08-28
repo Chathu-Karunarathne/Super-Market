@@ -58,7 +58,7 @@ const Product = () => {
     setIsModalOpen(false);
   };
 
-  const handleDeleteProduct = () => {
+  const handleDeleteProduct = () =>  {
     setProducts((prevProducts) =>
       prevProducts.filter((product) => product.id !== selectedProduct.id)
     );
